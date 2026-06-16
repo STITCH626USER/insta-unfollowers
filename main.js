@@ -113,13 +113,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 obj.forEach(search);
             } else if (typeof obj === 'object') {
                 if (obj.string_list_data && Array.isArray(obj.string_list_data)) {
-                    obj.string_list_data.forEach(item => {
-                        if (item.value) usernames.add(item.value);
-                        else if (item.href) {
-                            const match = item.href.match(/instagram\.com\/([^\/?#]+)/);
-                            if (match) usernames.add(match[1]);
-                        }
-                    });
+                    if (obj.title && typeof obj.title === 'string' && obj.title !== '') {
+                        usernames.add(obj.title);
+                    } else {
+                        obj.string_list_data.forEach(item => {
+                            if (item.value) usernames.add(item.value);
+                            else if (item.href) {
+                                const match = item.href.match(/instagram\.com\/(?:_u\/)?([^\/?#]+)/);
+                                if (match && !['about', 'legal', 'explore', 'help'].includes(match[1])) {
+                                    usernames.add(match[1]);
+                                }
+                            }
+                        });
+                    }
                 } else {
                     for (const key in obj) {
                         search(obj[key]);

@@ -74,6 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     extractedSet = extractUsernamesHTML(text);
                 }
 
+                if (extractedSet.size === 0) {
+                    alert(`Attention : 0 utilisateurs trouvés dans ${file.name}. Vérifiez que c'est bien le bon fichier d'export Instagram.`);
+                }
+
                 if (type === 'followers') {
                     followersSet = extractedSet;
                     followersZone.classList.add('success');
@@ -111,6 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (obj.string_list_data && Array.isArray(obj.string_list_data)) {
                     obj.string_list_data.forEach(item => {
                         if (item.value) usernames.add(item.value);
+                        else if (item.href) {
+                            const match = item.href.match(/instagram\.com\/([^\/?#]+)/);
+                            if (match) usernames.add(match[1]);
+                        }
                     });
                 } else {
                     for (const key in obj) {
@@ -129,14 +137,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const usernames = new Set();
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlString, 'text/html');
-        // Instagram usually links usernames to https://www.instagram.com/username
-        const links = doc.querySelectorAll('a[href^="https://www.instagram.com/"]');
+        const links = doc.querySelectorAll('a');
         
         links.forEach(link => {
-            const username = link.textContent.trim();
-            // Basic validation to avoid weird links
-            if (username && !username.includes('/') && !username.includes(' ')) {
-                usernames.add(username);
+            const href = link.getAttribute('href') || '';
+            if (href.includes('instagram.com/')) {
+                let username = link.textContent.trim();
+                
+                // Fallback to extract from URL if text is empty or not a valid username
+                if (!username || username.includes(' ') || username.length > 30) {
+                    const match = href.match(/instagram\.com\/([^\/?#]+)/);
+                    if (match && !['about', 'legal', 'explore', 'help'].includes(match[1])) {
+                        username = match[1];
+                    }
+                }
+                
+                if (username && !username.includes('/') && !username.includes(' ')) {
+                    usernames.add(username);
+                }
             }
         });
         

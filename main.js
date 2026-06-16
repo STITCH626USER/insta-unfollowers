@@ -200,10 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             li.innerHTML = `
                 <div class="user-info">
-                    <div class="avatar"><div class="avatar-inner"></div></div>
                     <div class="user-details">
-                        <span class="username">${username}</span>
-                        <span class="user-sub">Instagram</span>
+                        <span class="username">@${username}</span>
                     </div>
                 </div>
                 <a href="${profileUrl}" target="_blank" rel="noopener noreferrer" class="profile-link">Voir</a>

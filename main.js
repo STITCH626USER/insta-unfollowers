@@ -199,8 +199,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const profileUrl = `https://www.instagram.com/${username}/`;
             
             li.innerHTML = `
-                <span class="username">@${username}</span>
-                <a href="${profileUrl}" target="_blank" rel="noopener noreferrer" class="profile-link">View Profile</a>
+                <div class="user-info">
+                    <div class="avatar"><div class="avatar-inner"></div></div>
+                    <div class="user-details">
+                        <span class="username">${username}</span>
+                        <span class="user-sub">Instagram</span>
+                    </div>
+                </div>
+                <a href="${profileUrl}" target="_blank" rel="noopener noreferrer" class="profile-link">Voir</a>
             `;
             unfollowersList.appendChild(li);
         });

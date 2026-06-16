@@ -1,42 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insta-Unfollowers</title>
     <meta name="description" content="Find out who doesn't follow you back on Instagram.">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="background-elements">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-    </div>
-    <div class="container">
-        <header>
-            <h1>Insta-Unfollowers</h1>
-            <p>Find out who doesn't follow you back</p>
-        </header>
+    <nav class="navbar">
+        <h1>Insta-Unfollowers</h1>
+    </nav>
 
-        <div class="upload-section">
-            <div class="drop-zone" id="followers-zone">
-                <span class="icon">👥</span>
-                <span class="text">Drop <b>followers</b> here (JSON/HTML)</span>
-                <input type="file" id="followers-input" accept=".json,.html">
+    <div class="main-container">
+        <div class="card">
+            <div class="header-text">
+                <p>Découvrez qui ne vous suit pas en retour</p>
             </div>
-            <div class="drop-zone" id="following-zone">
-                <span class="icon">🚶‍♂️</span>
-                <span class="text">Drop <b>following</b> here (JSON/HTML)</span>
-                <input type="file" id="following-input" accept=".json,.html">
+
+            <div class="upload-section">
+                <div class="drop-zone" id="followers-zone">
+                    <span class="icon">👥</span>
+                    <span class="text">Fichier <b>followers</b></span>
+                    <input type="file" id="followers-input" accept=".json,.html">
+                </div>
+                <div class="drop-zone" id="following-zone">
+                    <span class="icon">🚶‍♂️</span>
+                    <span class="text">Fichier <b>following</b></span>
+                    <input type="file" id="following-input" accept=".json,.html">
+                </div>
             </div>
+
+            <button id="analyze-btn" disabled>Analyser</button>
         </div>
 
-        <button id="analyze-btn" disabled>Analyze</button>
-
         <div id="results" class="hidden">
-            <h2>Non-Followers <span id="count-badge">0</span></h2>
-            <p class="subtitle">People you follow who don't follow you back</p>
+            <div class="results-header">
+                <h2>Non-abonnés <span id="count-badge">0</span></h2>
+                <p class="subtitle">Personnes que vous suivez mais qui ne vous suivent pas en retour.</p>
+            </div>
             <ul id="unfollowers-list"></ul>
         </div>
     </div>

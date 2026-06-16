@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const countBadge = document.getElementById('count-badge');
     const unfollowersList = document.getElementById('unfollowers-list');
 
-    let followersData = null;
-    let followingData = null;
+    let followersSet = null;
+    let followingSet = null;
 
     // Handle drag and drop visuals
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -55,27 +55,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function processFile(file, type) {
-        if (file.type !== "application/json" && !file.name.endsWith('.json')) {
-            alert("Please drop a valid JSON file.");
+        if (!file.name.endsWith('.json') && !file.name.endsWith('.html') && file.type !== "application/json" && file.type !== "text/html") {
+            alert("Please drop a valid JSON or HTML file.");
             return;
         }
 
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
-                const data = JSON.parse(e.target.result);
+                const text = e.target.result;
+                let extractedSet = new Set();
+
+                // Simple heuristic to check if it's JSON or HTML
+                if (file.name.endsWith('.json') || text.trim().startsWith('{') || text.trim().startsWith('[')) {
+                    const data = JSON.parse(text);
+                    extractedSet = extractUsernamesJSON(data);
+                } else {
+                    extractedSet = extractUsernamesHTML(text);
+                }
+
                 if (type === 'followers') {
-                    followersData = data;
+                    followersSet = extractedSet;
                     followersZone.classList.add('success');
                     followersZone.querySelector('.text').innerHTML = '✅ <b>followers</b> loaded';
                 } else {
-                    followingData = data;
+                    followingSet = extractedSet;
                     followingZone.classList.add('success');
                     followingZone.querySelector('.text').innerHTML = '✅ <b>following</b> loaded';
                 }
                 checkReady();
             } catch (err) {
-                alert("Error parsing JSON file. Please ensure it's the correct Instagram export file.");
+                alert("Error parsing file. Please ensure it's the correct Instagram export file.");
                 console.error(err);
             }
         };
@@ -83,13 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkReady() {
-        if (followersData && followingData) {
+        if (followersSet && followingSet) {
             analyzeBtn.disabled = false;
         }
     }
 
     // Extract usernames robustly from Instagram's JSON structures
-    function extractUsernames(data) {
+    function extractUsernamesJSON(data) {
         const usernames = new Set();
         
         function search(obj) {
@@ -114,11 +124,27 @@ document.addEventListener('DOMContentLoaded', () => {
         return usernames;
     }
 
-    analyzeBtn.addEventListener('click', () => {
-        if (!followersData || !followingData) return;
+    // Extract usernames from Instagram's HTML export structures
+    function extractUsernamesHTML(htmlString) {
+        const usernames = new Set();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, 'text/html');
+        // Instagram usually links usernames to https://www.instagram.com/username
+        const links = doc.querySelectorAll('a[href^="https://www.instagram.com/"]');
+        
+        links.forEach(link => {
+            const username = link.textContent.trim();
+            // Basic validation to avoid weird links
+            if (username && !username.includes('/') && !username.includes(' ')) {
+                usernames.add(username);
+            }
+        });
+        
+        return usernames;
+    }
 
-        const followersSet = extractUsernames(followersData);
-        const followingSet = extractUsernames(followingData);
+    analyzeBtn.addEventListener('click', () => {
+        if (!followersSet || !followingSet) return;
 
         const unfollowers = [];
         
